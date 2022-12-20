@@ -20,15 +20,29 @@ class Room(CommonModel):
     address = models.CharField(max_length=250)
     pets_friendly = models.BooleanField(default=True)
     kind = models.CharField(max_length=20, choices=RoomKindChoices.choices)
-    owner = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="rooms",)
-    amenities = models.ManyToManyField("rooms.Amenity", related_name="rooms",)
-    category = models.ForeignKey("categories.Category", null=True, default="", on_delete=models.SET_NULL, related_name="rooms",)
+    owner = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="rooms", )
+    amenities = models.ManyToManyField("rooms.Amenity", related_name="rooms", )
+    category = models.ForeignKey("categories.Category", null=True, default="", on_delete=models.SET_NULL,
+                                 related_name="rooms", )
 
     def __str__(self) -> str:
         return self.name
 
     def total_amenities(self) -> int:
         return self.amenities.count()
+
+    def rating(self) -> str:
+        count = self.reviews.count()
+        if count == 0:
+            return "No Reviews"
+        else:
+            tot_rating = 0
+            # 아래와 동일한 방법(최적화 아래가 더 좋음)
+            # for review in self.reviews.all():
+            #     tot_rating += review.rating
+            for review in self.reviews.all().values("rating"):
+                tot_rating += review["rating"]
+            return round(tot_rating / count, 1)
 
 
 class Amenity(CommonModel):
