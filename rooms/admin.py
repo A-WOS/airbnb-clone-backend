@@ -22,6 +22,15 @@ class RoomAdmin(admin.ModelAdmin):
         "amenities",
     )
 
+    # contains (포함되어 있는지) 로 찾음
+    search_fields = (
+        # ^ -> startswith
+        "name",
+        "^price",
+        # "=price", equals
+        "owner__username",
+    )
+
 
 @admin.register(Amenity)
 class AmenityAdmin(admin.ModelAdmin):
