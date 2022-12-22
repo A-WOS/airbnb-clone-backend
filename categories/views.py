@@ -1,14 +1,17 @@
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Category
-from django.http import JsonResponse
-from django.core import serializers
+from .serializers import CategorySerializer
 
 
+@api_view()
 def categories(request):
     all_categories = Category.objects.all()
-    return JsonResponse(
+    # 여러 개의 카테고리를 보내고 싶다면 many=True 옵션 추가
+    serializer = CategorySerializer(all_categories, many=True)
+    return Response(
         {
             "ok": True,
-            # serializers = querySet 을 json 타입으로 변경
-            "categories": serializers.serialize("json", all_categories),
+            "categories": serializer.data,
         }
     )
